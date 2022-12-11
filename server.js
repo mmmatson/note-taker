@@ -42,7 +42,7 @@ app.get('/api/notes', (req, res) =>
 //GET Route for retrieving a specific note - note renders to right-hand column when clicked
 app.get('/api/notes/:id', (req, res) => {
     const note = notes.find(c => c.id === parseInt(req.params.id))
-    if (!note) res.status(404).send("The note with the given ID was not found")
+    if (!note) return res.status(404).send("The note with the given ID was not found")
     res.send(note)
 }
 );
@@ -91,6 +91,34 @@ app.post('/api/notes', (req, res) => {
     } else {
         res.status(500).json('Error in posting note');
     }
+});
+
+//DELETE request for a specific note
+app.delete('/api/notes/:id', (req, res) => {
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            // // Convert string into JSON object
+            const parsedNotes2 = JSON.parse(data);
+            //Specify note to delete
+            const noteDelete = parsedNotes2.find(c => c.id === parseInt(req.params.id))
+            // Delete specific note
+            const index = parsedNotes2.indexOf(noteDelete);
+            parsedNotes2.splice(index, 1);
+            // Write updated notes back to the file
+            fs.writeFile(
+                './db/db.json',
+                JSON.stringify(parsedNotes2, null, 4),
+                (writeErr) =>
+                    writeErr
+                        ? console.error(writeErr)
+                        : console.info('Successfully deleted note!')
+            )
+        }
+    });
+    //Read notes from file after deletion
+    readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)))
 });
 
 app.listen(PORT, () =>
