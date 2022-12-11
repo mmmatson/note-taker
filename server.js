@@ -7,8 +7,10 @@ const uuid = require('./helpers/uuid');
 const { clog } = require('./middleware/clog');
 
 const app = express();
-const PORT = 3001;
-
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 8000;
+}
 let notes = [];
 
 // Import custom middleware, "clog"
@@ -121,6 +123,4 @@ app.delete('/api/notes/:id', (req, res) => {
     readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)))
 });
 
-app.listen(PORT, () =>
-    console.log(`Note taker app listening at http://localhost:${PORT}`)
-);
+app.listen(port);
