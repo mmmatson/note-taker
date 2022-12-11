@@ -2,6 +2,6 @@
     {
         "title": "Test Title",
         "text": "Test text",
-        "note_id": "Test note_id"
+        "id": "Test note_id"
     }
 ]

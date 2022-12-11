@@ -9,6 +9,8 @@ const { clog } = require('./middleware/clog');
 const app = express();
 const PORT = 3001;
 
+let notes = [];
+
 // Import custom middleware, "clog"
 app.use(clog);
 
@@ -30,7 +32,19 @@ app.get('/notes', (req, res) =>
 
 // GET Route for retrieving all of the notes - renders notes to page
 app.get('/api/notes', (req, res) =>
-  readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)))
+    readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data))),
+);
+
+// GET Route for retrieving all notes and sending to notes array
+app.get('/api/notes', (req, res) =>
+    res.send(notes));
+
+//GET Route for retrieving a specific note - note renders to right-hand column when clicked
+app.get('/api/notes/:id', (req, res) => {
+    const note = notes.find(c => c.id === parseInt(req.params.id))
+    if (!note) res.status(404).send("The note with the given ID was not found")
+    res.send(note)
+}
 );
 
 // POST request to add a note - adds a note to the page
@@ -43,7 +57,7 @@ app.post('/api/notes', (req, res) => {
         const newNote = {
             title,
             text,
-            note_id: uuid(),
+            id: uuid(),
         };
 
         // Obtain existing notes
